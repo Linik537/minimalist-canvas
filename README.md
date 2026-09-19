@@ -37,7 +37,7 @@ Os testes Vitest cobrem slug, moeda, quilometragem, link de WhatsApp e horário 
 
 ## Implantação
 
-Configure as duas variáveis `VITE_` no provedor e direcione todas as rotas da SPA para `index.html`. Estão incluídos `vercel.json` e `public/_redirects`. Atualize o domínio em `public/robots.txt` e `public/sitemap.xml` antes de publicar.
+Na Vercel, em **Project Settings → Environment Variables**, configure `VITE_SUPABASE_URL` e `VITE_SUPABASE_PUBLISHABLE_KEY` para Production e Preview, e faça um novo deploy. O cliente também tem como fallback a URL e a chave publishable públicas deste projeto, para o site funcionar se as variáveis estiverem ausentes. Se o projeto ou a chave mudar, atualize as variáveis na Vercel. Direcione todas as rotas da SPA para `index.html` (já incluído em `vercel.json` e `public/_redirects`). Atualize o domínio em `public/robots.txt` e `public/sitemap.xml` antes de publicar.
 
 Como o site é uma SPA, metadados de veículos renderizados só no cliente podem não ser lidos por todos os bots sociais; pré-renderização ou SSR é uma evolução recomendada.
 
