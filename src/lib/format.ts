@@ -10,7 +10,8 @@ export const isOpenNow = (at = new Date()) => {
   const get = (type: string) => parts.find(p => p.type === type)?.value ?? ''
   const day = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].indexOf(get('weekday'))
   const now = Number(get('hour')) * 60 + Number(get('minute'))
-  return site.opening.days.some(d => d === day) && now >= 510 && now < 1080
+  const toMinutes=(time:string)=>{const [hours,minutes]=time.split(':').map(Number);return hours*60+minutes}
+  return site.opening.days.some(d => d === day) && now >= toMinutes(site.opening.opens) && now < toMinutes(site.opening.closes)
 }
 export const installment = (amount: number, down: number, n: number) => {
   const principal = Math.max(0, amount - down), r = site.monthlyInterestRate

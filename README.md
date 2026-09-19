@@ -24,7 +24,7 @@ O client usa os tipos gerados do schema real em `src/types/database.ts`.
 
 Troque os placeholders locais em `public/images/`: `hero.svg`, `banner.svg`, `categoria-carros.svg`, `categoria-motos.svg`, `categoria-financie.svg`, `categoria-venda.svg`. A logo está em `logo-braza.png`. Os arquivos SVG cumprem o papel dos placeholders de hero, banner e categorias, sem download ou hotlink de imagens externas. Se mudar os nomes ou extensões, ajuste as referências em `src/pages/Home.tsx`, `src/lib/vehicles.ts` e nos cards.
 
-Nome, contatos, endereço, WhatsApp, horário e taxa de simulação ficam em `src/config/site.ts`.
+Nome, contatos, endereço, WhatsApp, horário e taxa de simulação ficam em `src/config/site.ts`. O texto e os números da página Sobre ficam em `src/content/about.ts`.
 
 ## Verificações
 

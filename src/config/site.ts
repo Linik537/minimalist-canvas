@@ -14,3 +14,4 @@ export const site = {
   opening: { days: [1, 2, 3, 4, 5, 6], opens: '08:30', closes: '18:00' },
   monthlyInterestRate: 0.0199
 } as const
+export const openingHoursLabel = `Segunda a sábado, ${site.opening.opens} às ${site.opening.closes}`
