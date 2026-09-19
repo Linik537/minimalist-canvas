@@ -14,11 +14,13 @@ Site em pt-BR para a Braza Veículos, Uberlândia/MG. Front-end Vite + React 18 
 
 ## Projeto Supabase
 
-Projeto usado: **For the Future** (`elvolxdmgpjxekfdtlfo`). As migrations aplicadas estão em `supabase/migrations/0001_init.sql` e `0002_function_hardening.sql`.
+Projeto usado: **For the Future** (`elvolxdmgpjxekfdtlfo`). As migrations aplicadas estão em `supabase/migrations/0001_init.sql`, `0002_function_hardening.sql` e `0003_sell_photo_path_guard.sql`.
 
 O schema possui `vehicles`, `vehicle_photos`, `sell_requests`, `sell_request_photos`, `financing_requests` e `user_roles`, todos com RLS. Visitantes podem ler veículos e enviar solicitações; alterações no estoque e leitura/gestão das solicitações exigem role `admin`. Os buckets são `vehicle-photos` (público para leitura, escrita admin) e `sell-requests` (privado, upload público limitado a imagens em `public/`, leitura admin). A função `has_role` fica no schema não exposto `app_private`.
 
 O client usa os tipos gerados do schema real em `src/types/database.ts`.
+
+A terceira migration exige que o caminho de cada foto de solicitação de venda siga `public/<id da solicitação>/...`, impedindo que um pedido associe metadados de fotos de outro pedido.
 
 ## Painel administrativo
 
@@ -53,10 +55,18 @@ Os testes Vitest cobrem slug, moeda, quilometragem, link de WhatsApp e horário 
 
 ## Implantação
 
-Na Vercel, em **Project Settings → Environment Variables**, configure `VITE_SUPABASE_URL` e `VITE_SUPABASE_PUBLISHABLE_KEY` para Production e Preview, e faça um novo deploy. O cliente também tem como fallback a URL e a chave publishable públicas deste projeto, para o site funcionar se as variáveis estiverem ausentes. Se o projeto ou a chave mudar, atualize as variáveis na Vercel. Direcione todas as rotas da SPA para `index.html` (já incluído em `vercel.json` e `public/_redirects`). Atualize o domínio em `public/robots.txt` e `public/sitemap.xml` antes de publicar.
+Na Vercel, em **Project Settings → Environment Variables**, configure `VITE_SUPABASE_URL` e `VITE_SUPABASE_PUBLISHABLE_KEY` para Production e Preview, e faça um novo deploy. Na Netlify, configure as mesmas variáveis em **Site configuration → Environment variables**. O cliente também tem como fallback a URL e a chave publishable públicas deste projeto, para o site funcionar se as variáveis estiverem ausentes. Se o projeto ou a chave mudar, atualize as variáveis no provedor. Direcione todas as rotas da SPA para `index.html` (já incluído em `vercel.json` e `public/_redirects`). Atualize o domínio em `public/robots.txt` e `public/sitemap.xml` antes de publicar.
 
 Como o site é uma SPA, metadados de veículos renderizados só no cliente podem não ser lidos por todos os bots sociais; pré-renderização ou SSR é uma evolução recomendada.
 
 ## Configuração pendente no painel Supabase
 
 Em **Authentication → Sign In / Providers**, desligue **Allow new users to sign up**. Em **Authentication → Settings → Password Security**, habilite **Leaked Password Protection**; o advisor ainda aponta esse aviso, e a conexão disponível não expõe essas configurações de Auth. O acesso ao admin já exige role no banco. Revise também a política de privacidade antes de publicar.
+
+Checklist manual:
+
+- [ ] Desativar cadastro público no Supabase Auth e habilitar proteção contra senhas vazadas.
+- [ ] Configurar as duas variáveis `VITE_SUPABASE_*` no provedor e publicar novamente.
+- [ ] Trocar placeholders, conferir contatos e revisar a política de privacidade.
+- [ ] Substituir `brazaveiculos.com.br` em `robots.txt` e `sitemap.xml` pelo domínio definitivo.
+- [ ] Entrar em `/admin/login` e testar um cadastro de veículo com foto real; a sessão Auth existente é necessária para validar o upload físico ao Storage.
