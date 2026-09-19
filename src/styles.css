@@ -1,0 +1,25 @@
+@tailwind base; @tailwind components; @tailwind utilities;
+:root { --background: 0 0% 100%; --foreground: 222 24% 10%; --card: 0 0% 100%; --muted: 220 20% 96%; --border: 218 18% 87%; --primary: 219 89% 34%; --accent: 0 79% 55%; color-scheme: light; }
+.dark { --background: 225 24% 6%; --foreground: 210 20% 96%; --card: 223 20% 10%; --muted: 223 17% 15%; --border: 221 12% 25%; --primary: 220 73% 55%; --accent: 0 79% 58%; color-scheme: dark; }
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: hsl(var(--background)); color: hsl(var(--foreground)); font-family: Inter,sans-serif; }
+h1,h2,h3,h4 { font-family: Syne,sans-serif; letter-spacing: -.035em; }
+button,input,select,textarea { font: inherit; }
+button { cursor: pointer; }
+:focus-visible { outline: 3px solid hsl(var(--primary)); outline-offset: 3px; }
+.container-wide { max-width: 1320px; margin-inline: auto; padding-inline: 1.25rem; }
+.section-space { padding-block: 5.5rem; }
+.pill { border-radius: 9999px; }
+.btn-primary { display:inline-flex;align-items:center;justify-content:center;gap:.5rem;border-radius:9999px;background:hsl(var(--primary));color:white;padding:.85rem 1.5rem;font-weight:700;transition:transform .2s,background .2s; }
+.btn-primary:hover { transform:translateY(-2px); background:hsl(var(--accent)); }
+.btn-outline { display:inline-flex;align-items:center;justify-content:center;gap:.5rem;border:1px solid hsl(var(--border));border-radius:9999px;padding:.8rem 1.4rem;font-weight:700; }
+.btn-outline:hover { border-color:hsl(var(--primary));color:hsl(var(--primary)); }
+.field { width:100%;border:1px solid hsl(var(--border));border-radius:1rem;background:hsl(var(--card));padding:.78rem 1rem;color:hsl(var(--foreground)); }
+.field:focus { outline:2px solid hsl(var(--primary)); }
+.label { display:block;font-size:.82rem;font-weight:700;margin-bottom:.4rem; }
+.card-shell { background:hsl(var(--card));border:1px solid hsl(var(--border));border-radius:1.5rem;overflow:hidden;transition:transform .25s,border-color .25s; }
+.card-shell:hover { transform:translateY(-4px);border-color:hsl(var(--primary)); }
+.skeleton { background:linear-gradient(90deg,hsl(var(--muted)),hsl(var(--border)),hsl(var(--muted)));background-size:200% 100%;animation:shimmer 1.4s infinite; }
+@keyframes shimmer { to { background-position:-200% 0; } }
+@media (prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important; } }

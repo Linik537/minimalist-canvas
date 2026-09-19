@@ -1,0 +1,24 @@
+import { useState } from 'react'
+import { ArrowUpRight, Copy, Gauge, CalendarDays, Fuel, Settings2, CarFront, Palette, Wrench, Share2 } from 'lucide-react'
+import { Link, useParams } from 'react-router-dom'
+import { SEO } from '../components/SEO'
+import { VehicleGallery } from '../components/VehicleGallery'
+import { VehicleCard } from '../components/VehicleCard'
+import { useVehicles } from '../hooks/useVehicles'
+import { cover } from '../lib/vehicles'
+import { km, money, whatsappFor } from '../lib/format'
+export default function VehiclePage(){
+  const {slug}=useParams()
+  const {data=[],isLoading}=useVehicles()
+  const [copied,setCopied]=useState(false)
+  const v=data.find(x=>x.slug===slug)
+  if(isLoading)return <div className="container-wide pb-24 pt-40"><div className="skeleton h-[60vh] rounded-3xl"/></div>
+  if(!v)return <div className="container-wide pb-24 pt-40"><h1 className="text-4xl">Veículo não encontrado</h1><Link className="btn-primary mt-6" to="/estoque">Voltar ao estoque</Link></div>
+  const title=`${v.brand} ${v.model} ${v.version}`.trim()
+  const message=`Olá! Tenho interesse no ${title}, ano ${v.manufacture_year}/${v.model_year}. ${window.location.href}`
+  const images=v.vehicle_photos.map(p=>p.url).length?v.vehicle_photos.map(p=>p.url):[cover(v)]
+  const specs=[[CarFront,'Marca',v.brand],[CarFront,'Modelo',v.model],[Settings2,'Versão',v.version||'—'],[CalendarDays,'Ano fabricação',v.manufacture_year],[CalendarDays,'Ano modelo',v.model_year],[Gauge,'Quilometragem',km(v.mileage)],[Palette,'Cor',v.color],[Wrench,'Motor',v.engine],[Settings2,'Tração',v.drivetrain],[Fuel,'Combustível',v.fuel],[Settings2,'Câmbio',v.transmission]]
+  const share=async()=>{try{if(navigator.share)await navigator.share({title,url:location.href});else{await navigator.clipboard.writeText(location.href);setCopied(true)}}catch{/* cancelado */}}
+  const structured={'@context':'https://schema.org','@type':'Vehicle',name:title,vehicleModelDate:String(v.model_year),mileageFromOdometer:{'@type':'QuantitativeValue',value:v.mileage,unitCode:'KMT'},offers:{'@type':'Offer',price:v.price,priceCurrency:'BRL',availability:'https://schema.org/InStock'},image:images[0]}
+  return <><SEO title={title} description={`${title} por ${money(v.price)}. ${km(v.mileage)}. Veja fotos e ficha técnica na Braza Veículos.`} image={images[0]} structured={structured}/><section className="container-wide pb-24 pt-40"><div className="mb-8"><Link to="/estoque" className="text-sm font-semibold text-primary">← Voltar ao estoque</Link><div className="mt-5 flex flex-wrap gap-3"><span className="rounded-full bg-muted px-3 py-1 text-xs font-bold">{v.type==='carro'?'Carro':'Moto'}</span>{v.featured&&<span className="rounded-full bg-accent px-3 py-1 text-xs font-bold text-white">Destaque</span>}</div><h1 className="mt-3 text-4xl font-extrabold md:text-6xl">{title}</h1><p className="mt-2 text-foreground/60">{v.manufacture_year}/{v.model_year}</p></div><div className="grid gap-10 lg:grid-cols-[minmax(0,1.5fr)_minmax(310px,.7fr)]"><div><VehicleGallery images={images} title={title}/><section className="mt-12"><h2 className="mb-5 text-3xl">Ficha técnica</h2><div className="grid gap-3 sm:grid-cols-2">{specs.map(([Icon,label,value])=>{const I=Icon as typeof CarFront;return <div key={label as string} className="flex items-center gap-3 rounded-2xl bg-muted p-4"><I className="text-primary" size={20}/><div><small className="block text-foreground/55">{label as string}</small><strong>{value as string|number}</strong></div></div>})}</div></section><section className="mt-12"><h2 className="mb-4 text-3xl">Sobre este veículo</h2><p className="whitespace-pre-line text-foreground/75">{v.description||'Entre em contato para saber mais sobre este veículo.'}</p>{v.features.length>0&&<div className="mt-5 flex flex-wrap gap-2">{v.features.map(f=><span key={f} className="rounded-full bg-muted px-4 py-2 text-sm">{f}</span>)}</div>}</section></div><aside><div className="sticky top-28 rounded-3xl border border-border bg-card p-7"><span className="text-sm text-foreground/60">Preço</span><strong className="mt-1 block font-display text-4xl">{money(v.price)}</strong><p className="mt-2 text-sm text-foreground/60">Consulte condições de pagamento.</p><a href={whatsappFor(message)} target="_blank" rel="noopener noreferrer" className="btn-primary mt-7 w-full">Tenho interesse · WhatsApp <ArrowUpRight size={18}/></a><Link to={`/financie?veiculo=${v.id}`} className="btn-outline mt-3 w-full">Simular financiamento</Link><button onClick={share} className="btn-outline mt-3 w-full"><Share2 size={18}/>{copied?<><Copy size={16}/> Link copiado</>:'Compartilhar'}</button></div></aside></div><section className="mt-20"><h2 className="mb-7 text-3xl">Veículos semelhantes</h2><div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">{data.filter(x=>x.id!==v.id&&x.type===v.type).slice(0,4).map(x=><VehicleCard key={x.id} vehicle={x}/>)}</div></section></section></>
+}
