@@ -1,6 +1,10 @@
 export const money = (value: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(value)
 export const km = (value: number) => `${new Intl.NumberFormat('pt-BR').format(value)} km`
 export const digits = (value: string) => value.replace(/\D/g, '')
+export const whatsappContactLink = (phone: string) => {
+  const number = digits(phone)
+  return `https://wa.me/${number.startsWith('55') && number.length >= 12 ? number : `55${number}`}`
+}
 export const slugify = (value: string) => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
 export const vehicleSlug = (brand: string, model: string, year: number) => `${slugify(`${brand}-${model}-${year}`)}-${crypto.randomUUID().slice(0, 6)}`
 export const whatsappFor = (message: string) => `https://wa.me/${site.whatsappNumber}?text=${encodeURIComponent(message)}`

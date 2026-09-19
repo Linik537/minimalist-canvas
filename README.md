@@ -20,6 +20,22 @@ O schema possui `vehicles`, `vehicle_photos`, `sell_requests`, `sell_request_pho
 
 O client usa os tipos gerados do schema real em `src/types/database.ts`.
 
+## Painel administrativo
+
+Acesse `/admin/login` com um usuário do Supabase Auth que tenha a role `admin` em `user_roles`. Não existe cadastro público pelo site. O painel permite trocar a própria senha em **Senha**, gerenciar veículos e fotos (até 20 por veículo, com reordenação e compressão) e tratar solicitações de venda e financiamento.
+
+Para criar outro admin, crie o usuário em **Authentication → Users → Add user** no projeto correto, com o e-mail confirmado. Depois, no SQL Editor do mesmo projeto, associe a role:
+
+```sql
+insert into public.user_roles (user_id, role)
+select id, 'admin'::public.app_role
+from auth.users
+where email = 'EMAIL_DO_NOVO_ADMIN'
+on conflict do nothing;
+```
+
+Para redefinir uma senha, use **Authentication → Users → usuário → Send password recovery** ou peça ao admin autenticado para usar **Senha** no painel. Nunca coloque senhas no repositório.
+
 ## Imagens e dados da loja
 
 Troque os placeholders locais em `public/images/`: `hero.svg`, `banner.svg`, `categoria-carros.svg`, `categoria-motos.svg`, `categoria-financie.svg`, `categoria-venda.svg`. A logo transparente do header e footer está em `public/images/logo-braza.png`; o favicon original enviado está em `public/favicon.png`. Os arquivos SVG cumprem o papel dos placeholders de hero, banner e categorias, sem download ou hotlink de imagens externas. Se mudar os nomes ou extensões, ajuste as referências em `src/pages/Home.tsx`, `src/lib/vehicles.ts` e nos cards.
@@ -43,4 +59,4 @@ Como o site é uma SPA, metadados de veículos renderizados só no cliente podem
 
 ## Configuração pendente no painel Supabase
 
-Em **Authentication → Providers → Email**, desative cadastro público de usuários. Em **Authentication → Settings → Password Security**, habilite **Leaked Password Protection**; o advisor ainda aponta esse aviso, e a conexão disponível não expõe essas configurações de Auth. O acesso ao admin já exige role no banco. Revise também a política de privacidade antes de publicar.
+Em **Authentication → Sign In / Providers**, desligue **Allow new users to sign up**. Em **Authentication → Settings → Password Security**, habilite **Leaked Password Protection**; o advisor ainda aponta esse aviso, e a conexão disponível não expõe essas configurações de Auth. O acesso ao admin já exige role no banco. Revise também a política de privacidade antes de publicar.
