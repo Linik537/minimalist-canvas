@@ -12,7 +12,7 @@ export default {
       'logo-badge': 'hsl(var(--logo-badge))', 'brand-tint': 'hsl(var(--brand-tint))',
       whatsapp: 'hsl(var(--whatsapp))'
     },
-    fontFamily: { display: ['Syne', 'sans-serif'], body: ['Inter', 'sans-serif'] }
+    fontFamily: { display: ['Outfit', 'sans-serif'], body: ['Inter', 'sans-serif'] }
   } },
   plugins: []
 }

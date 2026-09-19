@@ -7,6 +7,7 @@ export const site = {
   phones: { alexandreFilho: '(34) 3212-0868', alexandreBraza: '(34) 99971-3860' },
   whatsappNumber: '5534999713860',
   whatsappLink: 'https://wa.me/message/M2H4H7YFQEM5B1',
+  contactWhatsapp: { alexandreBraza: 'https://wa.me/5534999713860', alexandreFilho: 'https://wa.me/553432120868' },
   socials: { instagram: '', facebook: '', youtube: '' },
   mapEmbed: 'https://www.google.com/maps?q=Av.+Jo%C3%A3o+Pinheiro,+3123,+Uberl%C3%A2ndia,+MG&output=embed',
   mapDirections: 'https://www.google.com/maps/search/?api=1&query=Av.+Jo%C3%A3o+Pinheiro,+3123,+Uberl%C3%A2ndia,+MG',

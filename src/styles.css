@@ -1,12 +1,12 @@
 @tailwind base; @tailwind components;
 :root { --background: 0 0% 100%; --foreground: 222 24% 10%; --card: 0 0% 100%; --muted: 220 20% 96%; --border: 218 18% 87%; --primary: 219 89% 34%; --accent: 0 79% 55%; color-scheme: light; }
 .dark { --background: 225 24% 6%; --foreground: 210 20% 96%; --card: 223 20% 10%; --muted: 223 17% 15%; --border: 221 12% 25%; --primary: 220 73% 55%; --accent: 0 79% 58%; color-scheme: dark; }
-:root { --positive: 142 72% 33%; --positive-bg: 142 65% 92%; --inverse: 225 24% 6%; --inverse-foreground: 0 0% 100%; --logo-badge: 0 0% 100%; --brand-tint: 220 100% 78%; --whatsapp: 142 70% 49%; }
-.dark { --positive: 142 65% 65%; --positive-bg: 142 35% 17%; --inverse: 225 24% 6%; --inverse-foreground: 0 0% 100%; }
+:root { --positive: 142 72% 33%; --positive-bg: 142 65% 92%; --inverse: 225 24% 6%; --inverse-foreground: 0 0% 100%; --logo-badge: 0 0% 100%; --brand-tint: 220 100% 78%; --whatsapp-end: 219 95% 23%; }
+.dark { --positive: 142 65% 65%; --positive-bg: 142 35% 17%; --inverse: 225 24% 6%; --inverse-foreground: 0 0% 100%; --whatsapp-end: 220 83% 35%; }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }
 body { margin: 0; background: hsl(var(--background)); color: hsl(var(--foreground)); font-family: Inter,sans-serif; }
-h1,h2,h3,h4 { font-family: Syne,sans-serif; letter-spacing: -.035em; overflow-wrap:break-word; }
+h1,h2,h3,h4 { font-family: Outfit,sans-serif; letter-spacing: -.025em; overflow-wrap:break-word; }
 button,input,select,textarea { font: inherit; }
 button { cursor: pointer; }
 :focus-visible { outline: 3px solid hsl(var(--primary)); outline-offset: 3px; }
@@ -27,6 +27,8 @@ button { cursor: pointer; }
 .hero-stage { background-color:hsl(var(--inverse));background-image:linear-gradient(90deg,rgba(4,10,22,.88),rgba(4,10,22,.35)),url('/images/hero.svg');background-size:cover;background-position:center; }
 .banner-stage { background-color:hsl(var(--inverse));background-image:linear-gradient(90deg,rgba(4,8,19,.92),rgba(4,8,19,.25)),url('/images/banner.svg');background-size:cover;background-position:center; }
 .category-shade { background:linear-gradient(to bottom,rgba(0,0,0,.55),transparent 50%,rgba(0,0,0,.25)); }
+.brand-mark { filter:drop-shadow(0 1px 2px hsl(var(--foreground) / .35)); }
+.whatsapp-float { background:linear-gradient(135deg,hsl(var(--primary)),hsl(var(--whatsapp-end))); }
 .reveal { opacity:0; transform:translateY(22px); transition:opacity .6s ease,transform .6s ease; }
 .reveal.reveal-visible { opacity:1;transform:none; }
 @keyframes fade { from { opacity:.35 } to { opacity:1 } }
