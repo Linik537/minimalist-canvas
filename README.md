@@ -26,6 +26,8 @@ A terceira migration exige que o caminho de cada foto de solicitação de venda 
 
 Acesse `/admin/login` com um usuário do Supabase Auth que tenha a role `admin` em `user_roles`. Não existe cadastro público pelo site. O painel permite trocar a própria senha em **Senha**, gerenciar veículos e fotos (até 20 por veículo, com reordenação e compressão) e tratar solicitações de venda e financiamento.
 
+O formulário de veículo guarda automaticamente os campos do rascunho no armazenamento local do navegador e as fotos ainda não enviadas no IndexedDB, separados por conta admin e veículo. Ao voltar à aba ou recarregar a página, o rascunho é restaurado. Ele é removido após salvar o veículo com sucesso.
+
 Para criar outro admin, crie o usuário em **Authentication → Users → Add user** no projeto correto, com o e-mail confirmado. Depois, no SQL Editor do mesmo projeto, associe a role:
 
 ```sql
