@@ -5,7 +5,7 @@ import { CSS } from '@dnd-kit/utilities'
 import { ArrowLeft, ArrowRight, GripVertical, Upload } from 'lucide-react'
 import { cropGeometry, croppedPhotoBlob, defaultPhotoCrop, drawCroppedPhoto, loadPhoto, type PhotoCrop } from '../../lib/photoCrop'
 
-export type EditorPhoto = { id: string; source: File | string; label: string; isNew: boolean }
+export type EditorPhoto = { id: string; source: File | string; preview?: Blob; label: string; isNew: boolean }
 type Props = {
   photos: EditorPhoto[]; selectedId: string | null; crop: PhotoCrop; busy: boolean; progress: number; error: string
   onSelect: (id: string) => void; onCrop: (crop: PhotoCrop) => void; onMove: (id: string, delta: number) => void
@@ -20,10 +20,11 @@ function PhotoTile({ photo, index, active, busy, onSelect, onMove, onCover, onRe
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: photo.id, disabled: busy })
   const [url, setUrl] = useState('')
   useEffect(() => {
-    const objectUrl = photo.source instanceof File ? URL.createObjectURL(photo.source) : null
-    setUrl(objectUrl ?? photo.source as string)
+    const display = photo.preview ?? photo.source
+    const objectUrl = display instanceof Blob ? URL.createObjectURL(display) : null
+    setUrl(objectUrl ?? display as string)
     return () => { if (objectUrl) URL.revokeObjectURL(objectUrl) }
-  }, [photo.source])
+  }, [photo.source, photo.preview])
   return <div ref={setNodeRef} style={{ transform: CSS.Transform.toString(transform), transition }} className={`relative overflow-hidden rounded-xl border-2 bg-card ${active ? 'border-primary' : 'border-border'}`}>
     <button type="button" disabled={busy} onClick={onSelect} className="block w-full text-left" aria-label={`Editar ${photo.label}`}>
       {url && <img src={url} alt={photo.label} width="224" height="168" className="aspect-[4/3] w-full object-cover" />}
