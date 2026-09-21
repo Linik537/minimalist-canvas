@@ -24,8 +24,9 @@ button { cursor: pointer; }
 .card-shell:hover { transform:translateY(-4px);border-color:hsl(var(--primary)); }
 .skeleton { background:linear-gradient(90deg,hsl(var(--muted)),hsl(var(--border)),hsl(var(--muted)));background-size:200% 100%;animation:shimmer 1.4s infinite; }
 @keyframes shimmer { to { background-position:-200% 0; } }
-.hero-stage { background-color:hsl(var(--inverse));background-image:linear-gradient(90deg,rgba(4,10,22,.88),rgba(4,10,22,.38)),url('/images/hero-braza.jpg');background-size:cover;background-position:center; }
-.banner-stage { background-color:hsl(var(--inverse));background-image:linear-gradient(90deg,rgba(4,8,19,.92),rgba(4,8,19,.28)),url('/images/banner-braza.jpg');background-size:cover;background-position:center 42%; }
+.hero-stage { background-color:hsl(var(--inverse));background-image:linear-gradient(90deg,rgba(4,10,22,.88),rgba(4,10,22,.42)),url('/images/banner-braza.jpg');background-size:cover;background-position:55% center; }
+.banner-stage { background-color:hsl(var(--inverse));background-image:linear-gradient(90deg,rgba(4,8,19,.92),rgba(4,8,19,.30)),url('/images/hero-braza.jpg');background-size:cover;background-position:center 54%; }
+@media (max-width:640px) { .hero-stage { background-position:58% center; } .banner-stage { background-position:56% center; } }
 .category-shade { background:linear-gradient(to bottom,rgba(0,0,0,.55),transparent 50%,rgba(0,0,0,.25)); }
 .brand-mark { filter:drop-shadow(0 1px 2px hsl(var(--foreground) / .35)); }
 .whatsapp-float { background:linear-gradient(135deg,hsl(var(--primary)),hsl(var(--whatsapp-end))); }
