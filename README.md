@@ -40,7 +40,7 @@ Para redefinir uma senha, use **Authentication → Users → usuário → Send p
 
 ## Imagens e dados da loja
 
-O hero usa `public/images/hero-braza.jpg`, uma versão aprimorada da foto da fachada enviada para este projeto. Troque os outros placeholders locais em `public/images/`: `banner.svg`, `categoria-carros.svg`, `categoria-motos.svg`, `categoria-financie.svg`, `categoria-venda.svg`. A logo transparente do header e footer está em `public/images/logo-braza.png`; o favicon original enviado está em `public/favicon.png`. Se mudar os nomes ou extensões, ajuste as referências em `src/styles.css`, `src/pages/Home.tsx`, `src/components/SEO.tsx`, `src/lib/vehicles.ts` e nos cards.
+O hero usa `public/images/hero-braza.jpg`, uma versão aprimorada da foto da fachada enviada para este projeto. O banner “Mais de 30 anos realizando sonhos” usa `public/images/banner-braza.jpg`, otimizada da imagem enviada. Troque os outros placeholders locais em `public/images/`: `categoria-carros.svg`, `categoria-motos.svg`, `categoria-financie.svg`, `categoria-venda.svg`. A logo transparente do header e footer está em `public/images/logo-braza.png`; o favicon original enviado está em `public/favicon.png`. Se mudar os nomes ou extensões, ajuste as referências em `src/styles.css`, `src/pages/Home.tsx`, `src/components/SEO.tsx`, `src/lib/vehicles.ts` e nos cards.
 
 Nome, contatos, endereço, WhatsApp, horário e taxa de simulação ficam em `src/config/site.ts`. O texto e os números da página Sobre ficam em `src/content/about.ts`.
 
