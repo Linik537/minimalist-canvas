@@ -1,22 +1,24 @@
 export type DraftPhoto = { id: string; file: File }
+import type { PhotoCrop } from './photoCrop'
+type VehicleDraft<T> = { values: T; createdId?: string; order?: string[]; crops?: Record<string, PhotoCrop> }
 
 const databaseName = 'braza-admin-drafts'
 const storeName = 'vehicle-photos'
 
-export function readVehicleDraft<T>(key: string): { values: T; createdId?: string } | null {
+export function readVehicleDraft<T>(key: string): VehicleDraft<T> | null {
   try {
     const raw = localStorage.getItem(key)
     if (!raw) return null
     const draft: unknown = JSON.parse(raw)
     if (typeof draft !== 'object' || draft === null || !('values' in draft)) return null
-    return draft as { values: T; createdId?: string }
+    return draft as VehicleDraft<T>
   } catch {
     return null
   }
 }
 
-export function writeVehicleDraft<T>(key: string, values: T, createdId?: string) {
-  try { localStorage.setItem(key, JSON.stringify({ values, createdId })) } catch { /* armazenamento indisponível */ }
+export function writeVehicleDraft<T>(key: string, values: T, createdId?: string, order?: string[], crops?: Record<string, PhotoCrop>) {
+  try { localStorage.setItem(key, JSON.stringify({ values, createdId, order, crops })) } catch { /* armazenamento indisponível */ }
 }
 
 export function clearVehicleDraft(key: string) {
