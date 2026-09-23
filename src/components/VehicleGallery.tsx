@@ -5,10 +5,33 @@ import { useAutoRotate } from '../hooks/useAutoRotate'
 export function VehicleGallery({ images, title }: { images: string[]; title: string }) {
   const { active, select, setPaused } = useAutoRotate(images.length)
   const [lightbox, setLightbox] = useState(false)
+  const [displayed, setDisplayed] = useState(active)
+  const [incoming, setIncoming] = useState<number | null>(null)
+  const [revealIncoming, setRevealIncoming] = useState(false)
   const strip = useRef<HTMLDivElement>(null)
   const thumb = useRef<HTMLButtonElement>(null)
   const close = useRef<HTMLButtonElement>(null)
   const touch = useRef(0)
+
+  useEffect(() => {
+    if (active === displayed) return
+    setIncoming(active)
+    setRevealIncoming(false)
+    let revealFrame = 0
+    const prepareFrame = requestAnimationFrame(() => {
+      revealFrame = requestAnimationFrame(() => setRevealIncoming(true))
+    })
+    const finish = window.setTimeout(() => {
+      setDisplayed(active)
+      setIncoming(null)
+      setRevealIncoming(false)
+    }, 650)
+    return () => {
+      cancelAnimationFrame(prepareFrame)
+      cancelAnimationFrame(revealFrame)
+      clearTimeout(finish)
+    }
+  }, [active, displayed])
 
   useEffect(() => {
     const row = strip.current
@@ -51,9 +74,10 @@ export function VehicleGallery({ images, title }: { images: string[]; title: str
   </>
 
   return <div onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)} onFocusCapture={() => setPaused(true)} onBlurCapture={event => { if (!event.currentTarget.contains(event.relatedTarget)) setPaused(false) }}>
-    <div className="relative overflow-hidden rounded-2xl bg-muted" onTouchStart={swipeStart} onTouchEnd={swipeEnd}>
-      <button type="button" className="block w-full" aria-label="Abrir galeria em tela cheia" onClick={() => setLightbox(true)}>
-        <img key={active} src={images[active]} alt={`${title} - foto ${active + 1}`} width="1000" height="750" className="aspect-[4/3] w-full object-cover motion-safe:animate-[fade_.35s_ease]" />
+    <div className="relative aspect-[4/3] overflow-hidden rounded-2xl bg-muted" onTouchStart={swipeStart} onTouchEnd={swipeEnd}>
+      <button type="button" className="absolute inset-0 block h-full w-full" aria-label="Abrir galeria em tela cheia" onClick={() => setLightbox(true)}>
+        <img src={images[displayed]} alt={`${title} - foto ${displayed + 1}`} width="1000" height="750" className="absolute inset-0 h-full w-full object-cover" />
+        {incoming !== null && <img src={images[incoming]} alt="" width="1000" height="750" className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-[600ms] ease-in-out motion-reduce:transition-none ${revealIncoming ? 'opacity-100' : 'opacity-0'}`} />}
       </button>
     </div>
 
