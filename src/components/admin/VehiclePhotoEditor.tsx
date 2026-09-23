@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { DndContext, closestCenter, type DragEndEvent } from '@dnd-kit/core'
-import { SortableContext, useSortable, rectSortingStrategy } from '@dnd-kit/sortable'
+import { DndContext, KeyboardSensor, PointerSensor, closestCenter, type DragEndEvent, useSensor, useSensors } from '@dnd-kit/core'
+import { SortableContext, sortableKeyboardCoordinates, useSortable, rectSortingStrategy } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { ArrowLeft, ArrowRight, GripVertical, Upload } from 'lucide-react'
 import { cropGeometry, croppedPhotoBlob, defaultPhotoCrop, drawCroppedPhoto, loadPhoto, type PhotoCrop } from '../../lib/photoCrop'
@@ -13,8 +13,8 @@ type Props = {
   onApply: (id: string, blob: Blob) => Promise<void>; onFiles: (files: FileList | null) => void
 }
 
-function PhotoTile({ photo, index, active, busy, onSelect, onMove, onCover, onRemove }: {
-  photo: EditorPhoto; index: number; active: boolean; busy: boolean
+function PhotoTile({ photo, index, photoCount, active, busy, onSelect, onMove, onCover, onRemove }: {
+  photo: EditorPhoto; index: number; photoCount: number; active: boolean; busy: boolean
   onSelect: () => void; onMove: (delta: number) => void; onCover: () => void; onRemove: () => void
 }) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: photo.id, disabled: busy })
@@ -38,7 +38,7 @@ function PhotoTile({ photo, index, active, busy, onSelect, onMove, onCover, onRe
     </div>
     <div className="absolute right-1 top-1 flex gap-1">
       <button type="button" disabled={busy || index === 0} onClick={() => onMove(-1)} aria-label="Mover foto para a esquerda" className="rounded bg-inverse/80 p-1 text-white disabled:opacity-40"><ArrowLeft size={13}/></button>
-      <button type="button" disabled={busy} onClick={() => onMove(1)} aria-label="Mover foto para a direita" className="rounded bg-inverse/80 p-1 text-white disabled:opacity-40"><ArrowRight size={13}/></button>
+      <button type="button" disabled={busy || index === photoCount - 1} onClick={() => onMove(1)} aria-label="Mover foto para a direita" className="rounded bg-inverse/80 p-1 text-white disabled:opacity-40"><ArrowRight size={13}/></button>
     </div>
   </div>
 }
@@ -50,6 +50,12 @@ export function VehiclePhotoEditor({ photos, selectedId, crop, busy, progress, e
   const [loaded, setLoaded] = useState<HTMLImageElement | null>(null)
   const [editorError, setEditorError] = useState('')
   const [processing, setProcessing] = useState(false)
+  const [draftCrop, setDraftCrop] = useState(crop)
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+  )
+  useEffect(() => { setDraftCrop(crop) }, [selected?.id, crop])
   useEffect(() => {
     let active = true
     setLoaded(null)
@@ -64,13 +70,13 @@ export function VehiclePhotoEditor({ photos, selectedId, crop, busy, progress, e
   }, [selected?.id, selected?.source])
   useEffect(() => {
     if (!loaded || !mainRef.current || !thumbRef.current) return
-    drawCroppedPhoto(mainRef.current, loaded, crop, 800, 600)
+    drawCroppedPhoto(mainRef.current, loaded, draftCrop, 800, 600)
     thumbRef.current.width = 350
     thumbRef.current.height = 250
     const context = thumbRef.current.getContext('2d')
     const frame = cropGeometry(800, 600, 350, 250, defaultPhotoCrop)
     context?.drawImage(mainRef.current, frame.x, frame.y, frame.width, frame.height)
-  }, [loaded, crop])
+  }, [loaded, draftCrop])
   const dragEnd = (event: DragEndEvent) => {
     if (event.over && event.active.id !== event.over.id) onReorder(String(event.active.id), String(event.over.id))
   }
@@ -78,13 +84,22 @@ export function VehiclePhotoEditor({ photos, selectedId, crop, busy, progress, e
     if (!selected || busy || processing) return
     setProcessing(true)
     setEditorError('')
-    try { await onApply(selected.id, await croppedPhotoBlob(selected.source, crop)) }
+    try { await onApply(selected.id, await croppedPhotoBlob(selected.source, draftCrop)) }
     catch (e) { setEditorError(e instanceof Error ? e.message : 'Não foi possível aplicar o ajuste.') }
     finally { setProcessing(false) }
   }
   const slider = (label: string, key: keyof PhotoCrop, min: number, max: number, step: number, left?: string, right?: string) => <label className="block text-sm">
-    <span className="mb-1 block">{label}: {key === 'zoom' ? `${crop.zoom.toFixed(1)}x` : crop[key]}</span>
-    <input type="range" min={min} max={max} step={step} value={crop[key]} disabled={busy || processing || !selected} onChange={e => onCrop({ ...crop, [key]: Number(e.target.value) })} className="w-full accent-primary" />
+    <span className="mb-1 block">{label}: {key === 'zoom' ? `${draftCrop.zoom.toFixed(1)}x` : draftCrop[key]}</span>
+    <input type="range" min={min} max={max} step={step} value={draftCrop[key]} disabled={busy || processing || !selected} onInput={e => {
+      const value = Number(e.currentTarget.value)
+      const next = { ...draftCrop, [key]: value }
+      if (loaded && value !== 0 && (key === 'horizontal' || key === 'vertical')) {
+        const base = cropGeometry(loaded.naturalWidth, loaded.naturalHeight, 800, 600, { ...next, zoom: 1 })
+        const lacksRoom = key === 'horizontal' ? Math.abs(base.width - 800) < 0.5 : Math.abs(base.height - 600) < 0.5
+        if (lacksRoom && next.zoom < 1.1) next.zoom = 1.1
+      }
+      setDraftCrop(next); onCrop(next)
+    }} className="w-full accent-primary" />
     {left && <span className="flex justify-between text-xs text-foreground/60"><span>{left}</span><span>{right}</span></span>}
   </label>
   return <section className="mt-9" aria-label="Editor de capa e fotos">
@@ -101,7 +116,7 @@ export function VehiclePhotoEditor({ photos, selectedId, crop, busy, progress, e
       </div>
     </div>
     <p className="mb-2 mt-4 text-sm text-foreground/70">Fotos atuais e novas · arraste ou use as setas para reordenar; a primeira é a capa.</p>
-    <DndContext collisionDetection={closestCenter} onDragEnd={dragEnd}><SortableContext items={photos.map(p => p.id)} strategy={rectSortingStrategy}><div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">{photos.map((photo, index) => <PhotoTile key={photo.id} photo={photo} index={index} active={selected?.id === photo.id} busy={busy || processing} onSelect={() => onSelect(photo.id)} onMove={delta => onMove(photo.id, delta)} onCover={() => onCover(photo.id)} onRemove={() => onRemove(photo.id)} />)}</div></SortableContext></DndContext>
+    <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={dragEnd}><SortableContext items={photos.map(p => p.id)} strategy={rectSortingStrategy}><div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">{photos.map((photo, index) => <PhotoTile key={photo.id} photo={photo} index={index} photoCount={photos.length} active={selected?.id === photo.id} busy={busy || processing} onSelect={() => onSelect(photo.id)} onMove={delta => onMove(photo.id, delta)} onCover={() => onCover(photo.id)} onRemove={() => onRemove(photo.id)} />)}</div></SortableContext></DndContext>
     <label className="mt-4 flex cursor-pointer flex-col items-center rounded-2xl border-2 border-dashed border-border p-6 text-center hover:border-primary" onDragOver={e => e.preventDefault()} onDrop={e => { e.preventDefault(); onFiles(e.dataTransfer.files) }}><Upload className="text-primary"/><span className="mt-2">Arraste ou selecione fotos</span><small>JPEG, PNG ou WebP · até 10 MB · máximo 20 fotos</small><input type="file" className="sr-only" accept="image/jpeg,image/png,image/webp" multiple disabled={busy || processing} onChange={e => { onFiles(e.target.files); e.target.value = '' }} /></label>
     {busy && <div className="mt-4"><p className="mb-1 text-sm">Salvando fotos · {progress}%</p><div role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100} className="h-3 overflow-hidden rounded-full bg-muted"><div className="h-full bg-primary" style={{ width: `${progress}%` }} /></div></div>}
   </section>
