@@ -1,19 +1,79 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type TouchEvent } from 'react'
 import { ChevronLeft, ChevronRight, X } from 'lucide-react'
 import { useAutoRotate } from '../hooks/useAutoRotate'
-export function VehicleGallery({images,title}:{images:string[];title:string}) {
-  const {active,select,setPaused}=useAutoRotate(images.length)
-  const [lightbox,setLightbox]=useState(false)
-  const strip=useRef<HTMLDivElement>(null)
-  const thumb=useRef<HTMLButtonElement>(null)
-  const close=useRef<HTMLButtonElement>(null)
-  const touch=useRef(0)
-  useEffect(()=>{const row=strip.current,item=thumb.current;if(!row||!item)return;const behavior=matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth';const left=item.offsetLeft,right=left+item.offsetWidth;if(left<row.scrollLeft)row.scrollTo({left,behavior});else if(right>row.scrollLeft+row.clientWidth)row.scrollTo({left:right-row.clientWidth,behavior})},[active])
-  useEffect(()=>{if(!lightbox)return;const prior=document.activeElement as HTMLElement|null;close.current?.focus();return()=>prior?.focus()},[lightbox])
-  useEffect(()=>{if(!lightbox)return;const onKey=(e:KeyboardEvent)=>{if(e.key==='Escape')setLightbox(false);if(e.key==='ArrowRight')select(active+1);if(e.key==='ArrowLeft')select(active-1)};window.addEventListener('keydown',onKey);return()=>window.removeEventListener('keydown',onKey)},[lightbox,active])
-  const arrows=images.length>1&&<><button type="button" className="absolute left-3 top-1/2 z-10 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-card text-foreground" aria-label="Foto anterior" onClick={e=>{e.stopPropagation();select(active-1)}}><ChevronLeft/></button><button type="button" className="absolute right-3 top-1/2 z-10 grid h-10 w-10 -translate-y-1/2 place-items-center rounded-full bg-card text-foreground" aria-label="Próxima foto" onClick={e=>{e.stopPropagation();select(active+1)}}><ChevronRight/></button></>
-  return <div onMouseEnter={()=>setPaused(true)} onMouseLeave={()=>setPaused(false)} onFocusCapture={()=>setPaused(true)} onBlurCapture={e=>{if(!e.currentTarget.contains(e.relatedTarget))setPaused(false)}}><div className="relative overflow-hidden rounded-3xl bg-muted" onTouchStart={e=>touch.current=e.touches[0].clientX} onTouchEnd={e=>{const delta=e.changedTouches[0].clientX-touch.current;if(Math.abs(delta)>50)select(active+(delta<0?1:-1))}}>
-    <button type="button" className="block w-full" aria-label="Abrir galeria em tela cheia" onClick={()=>setLightbox(true)}><img key={active} src={images[active]} alt={`${title} - foto ${active+1}`} width="1000" height="750" className="aspect-[4/3] w-full object-cover motion-safe:animate-[fade_.35s_ease]"/></button>{arrows}</div>
-    <div ref={strip} className="relative mt-4 flex max-w-[623px] gap-3 overflow-x-auto p-1">{images.map((url,i)=><button ref={i===active?thumb:undefined} type="button" key={i} onClick={()=>select(i)} aria-label={`Selecionar foto ${i+1}`} aria-current={i===active} className={`w-[115px] shrink-0 overflow-hidden rounded-xl border-[3px] transition ${i===active?'scale-105 border-primary':'border-transparent'}`}><img src={url} alt={`Miniatura ${i+1}`} width="115" height="82" className="aspect-[7/5] w-full object-cover"/></button>)}</div>
-    {lightbox&&<div role="dialog" aria-modal="true" aria-label="Galeria de fotos" className="fixed inset-0 z-[80] grid place-items-center bg-inverse/95 p-4" onClick={()=>setLightbox(false)} onTouchStart={e=>touch.current=e.touches[0].clientX} onTouchEnd={e=>{const delta=e.changedTouches[0].clientX-touch.current;if(Math.abs(delta)>50)select(active+(delta<0?1:-1))}}><button ref={close} aria-label="Fechar galeria" className="absolute right-5 top-5 z-20 text-inverse-foreground" onClick={()=>setLightbox(false)}><X size={30}/></button><div className="relative w-full max-w-6xl" onClick={e=>e.stopPropagation()}><img src={images[active]} alt={`${title} - foto ${active+1}`} width="1400" height="900" className="max-h-[85vh] w-full object-contain"/>{arrows}<p className="mt-3 text-center text-inverse-foreground">{active+1} / {images.length}</p></div></div>}</div>
+
+export function VehicleGallery({ images, title }: { images: string[]; title: string }) {
+  const { active, select, setPaused } = useAutoRotate(images.length)
+  const [lightbox, setLightbox] = useState(false)
+  const strip = useRef<HTMLDivElement>(null)
+  const thumb = useRef<HTMLButtonElement>(null)
+  const close = useRef<HTMLButtonElement>(null)
+  const touch = useRef(0)
+
+  useEffect(() => {
+    const row = strip.current
+    const item = thumb.current
+    if (!row || !item) return
+    const behavior = matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth'
+    const left = item.offsetLeft
+    const right = left + item.offsetWidth
+    if (left < row.scrollLeft) row.scrollTo({ left, behavior })
+    else if (right > row.scrollLeft + row.clientWidth) row.scrollTo({ left: right - row.clientWidth, behavior })
+  }, [active])
+
+  useEffect(() => {
+    if (!lightbox) return
+    const prior = document.activeElement as HTMLElement | null
+    close.current?.focus()
+    return () => prior?.focus()
+  }, [lightbox])
+
+  useEffect(() => {
+    if (!lightbox) return
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setLightbox(false)
+      if (event.key === 'ArrowRight') select(active + 1)
+      if (event.key === 'ArrowLeft') select(active - 1)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [lightbox, active, select])
+
+  const swipeStart = (event: TouchEvent) => { touch.current = event.touches[0].clientX }
+  const swipeEnd = (event: TouchEvent) => {
+    const delta = event.changedTouches[0].clientX - touch.current
+    if (Math.abs(delta) > 50) select(active + (delta < 0 ? 1 : -1))
+  }
+
+  const lightboxArrows = images.length > 1 && <>
+    <button type="button" className="absolute left-3 top-1/2 z-10 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-card text-foreground shadow-lg" aria-label="Foto anterior" onClick={() => select(active - 1)}><ChevronLeft /></button>
+    <button type="button" className="absolute right-3 top-1/2 z-10 grid h-11 w-11 -translate-y-1/2 place-items-center rounded-full bg-card text-foreground shadow-lg" aria-label="Próxima foto" onClick={() => select(active + 1)}><ChevronRight /></button>
+  </>
+
+  return <div onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)} onFocusCapture={() => setPaused(true)} onBlurCapture={event => { if (!event.currentTarget.contains(event.relatedTarget)) setPaused(false) }}>
+    <div className="relative overflow-hidden rounded-2xl bg-muted" onTouchStart={swipeStart} onTouchEnd={swipeEnd}>
+      <button type="button" className="block w-full" aria-label="Abrir galeria em tela cheia" onClick={() => setLightbox(true)}>
+        <img key={active} src={images[active]} alt={`${title} - foto ${active + 1}`} width="1000" height="750" className="aspect-[4/3] w-full object-cover motion-safe:animate-[fade_.35s_ease]" />
+      </button>
+    </div>
+
+    {images.length > 1 && <div className="mt-3 flex h-[82px] gap-2">
+      <button type="button" className="grid w-9 shrink-0 place-items-center rounded-lg border border-border bg-card transition hover:border-primary hover:text-primary" aria-label="Foto anterior" onClick={() => select(active - 1)}><ChevronLeft size={20} /></button>
+      <div ref={strip} className="flex min-w-0 flex-1 gap-2 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        {images.map((url, index) => <button ref={index === active ? thumb : undefined} type="button" key={`${url}-${index}`} onClick={() => select(index)} aria-label={`Selecionar foto ${index + 1}`} aria-current={index === active} className={`h-full min-w-[88px] flex-1 overflow-hidden rounded-lg border-2 transition ${index === active ? 'border-primary' : 'border-transparent opacity-80 hover:opacity-100'}`}>
+          <img src={url} alt={`Miniatura ${index + 1}`} width="112" height="82" className="h-full w-full object-cover" />
+        </button>)}
+      </div>
+      <button type="button" className="grid w-9 shrink-0 place-items-center rounded-lg border border-border bg-card transition hover:border-primary hover:text-primary" aria-label="Próxima foto" onClick={() => select(active + 1)}><ChevronRight size={20} /></button>
+    </div>}
+
+    {lightbox && <div role="dialog" aria-modal="true" aria-label="Galeria de fotos" className="fixed inset-0 z-[80] grid place-items-center bg-inverse/95 p-4" onClick={() => setLightbox(false)} onTouchStart={swipeStart} onTouchEnd={swipeEnd}>
+      <button ref={close} aria-label="Fechar galeria" className="absolute right-5 top-5 z-20 text-inverse-foreground" onClick={() => setLightbox(false)}><X size={30} /></button>
+      <div className="relative w-full max-w-6xl" onClick={event => event.stopPropagation()}>
+        <img src={images[active]} alt={`${title} - foto ${active + 1}`} width="1400" height="900" className="max-h-[85vh] w-full object-contain" />
+        {lightboxArrows}
+        <p className="mt-3 text-center text-inverse-foreground">{active + 1} / {images.length}</p>
+      </div>
+    </div>}
+  </div>
 }
