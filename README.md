@@ -24,7 +24,7 @@ A terceira migration exige que o caminho de cada foto de solicitação de venda 
 
 ## Painel administrativo
 
-Acesse `/admin/login` com um usuário do Supabase Auth que tenha a role `admin` em `user_roles`. Não existe cadastro público pelo site. O painel permite trocar a própria senha em **Senha**, gerenciar veículos e fotos (até 20 por veículo, com reordenação e compressão) e tratar solicitações de venda e financiamento.
+Acesse `/admin/login` com um usuário do Supabase Auth que tenha a role `admin` em `user_roles`. Não existe cadastro público pelo site. Em caso de senha perdida, use **Esqueci minha senha**; o link recebido abre `/admin/redefinir-senha` e permite criar uma nova senha. O painel também permite trocar a própria senha em **Senha**, gerenciar veículos e fotos (até 20 por veículo, com reordenação e compressão) e tratar solicitações de venda e financiamento.
 
 O formulário de veículo guarda automaticamente os campos do rascunho no armazenamento local do navegador e as fotos ainda não enviadas e os ajustes aplicados no IndexedDB, separados por conta admin e veículo. Ao voltar à aba ou recarregar a página, o rascunho é restaurado. Ele é removido após salvar o veículo com sucesso. O editor de fotos oferece prévias 4:3 e 7:5, zoom, posicionamento, otimização em WebP, seleção da capa e reordenação por arrasto ou setas. “Aplicar nesta foto e otimizar” atualiza a prévia imediatamente e permite reajustar a foto original; “Salvar veículo” envia os ajustes e grava a ordem. A exclusão de fotos já publicadas é aplicada imediatamente.
 
