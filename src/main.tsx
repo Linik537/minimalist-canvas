@@ -15,6 +15,11 @@ const Privacy=lazy(()=>import('./pages/Privacy'))
 const NotFound=lazy(()=>import('./pages/NotFound'))
 const Admin=lazy(()=>import('./pages/admin/Admin'))
 const queryClient=new QueryClient({defaultOptions:{queries:{staleTime:30000,retry:1}}})
+if (window.location.hash.includes('type=recovery') || window.location.search.includes('type=recovery')) {
+  void import('./lib/supabase').then(({ supabase }) => supabase.auth.onAuthStateChange(event => {
+    if (event === 'PASSWORD_RECOVERY' && window.location.pathname !== '/admin/redefinir-senha') window.location.assign('/admin/redefinir-senha')
+  }))
+}
 const router=createBrowserRouter([
   {element:<PublicLayout/>,children:[
     {index:true,element:<Home/>},{path:'estoque',element:<Inventory/>},{path:'estoque/:slug',element:<VehiclePage/>},
