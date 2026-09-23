@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
-import { Link, NavLink, Navigate, Route, Routes, useNavigate } from 'react-router-dom'
+import { NavLink, Navigate, Route, Routes, useNavigate } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
 import { CarFront, ClipboardList, KeyRound, LogOut } from 'lucide-react'
 import type { User } from '@supabase/supabase-js'
 import { supabase } from '../../lib/supabase'
+import { Brand } from '../../components/Layout'
 import AdminVehicles from './AdminVehicles'
 import VehicleForm from './VehicleForm'
 import Leads from './Leads'
@@ -32,7 +33,7 @@ function Shell({ userId }: { userId: string }) {
   const navigate = useNavigate()
   return <div className="min-h-screen bg-muted">
     <header className="border-b border-border bg-card"><div className="container-wide flex flex-wrap items-center justify-between gap-4 py-3">
-      <Link to="/admin"><img src="/images/logo-braza.png" alt="Braza Veículos" width="120" height="70" className="h-12 rounded-xl bg-white p-1" /></Link>
+      <Brand />
       <nav className="flex flex-wrap gap-3 text-sm font-bold"><NavLink to="/admin" end className="btn-outline"><CarFront size={17} />Veículos</NavLink><NavLink to="/admin/leads" className="btn-outline"><ClipboardList size={17} />Solicitações</NavLink><NavLink to="/admin/senha" className="btn-outline"><KeyRound size={17} />Senha</NavLink></nav>
       <button className="btn-outline" onClick={async () => { await supabase.auth.signOut(); navigate('/admin/login') }}><LogOut size={17} />Sair</button>
     </div></header>
